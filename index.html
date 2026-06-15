@@ -173,11 +173,11 @@ function setMode(){
 if(window.innerWidth > window.innerHeight){
 document.body.classList.add("horizontal");
 document.body.classList.remove("vertical");
-document.getElementById("bg").src="image/horizontal.png";
+document.getElementById("bg").src="horizontal.png";
 }else{
 document.body.classList.add("vertical");
 document.body.classList.remove("horizontal");
-document.getElementById("bg").src="image/vertical.png";
+document.getElementById("bg").src="vertical.png";
 }
 }
 window.addEventListener("resize", setMode);

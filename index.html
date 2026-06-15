@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HUD PRO CLEAN</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+background:black;
+overflow:hidden;
+font-family:Arial;
+width:100%;
+height:100%;
+}
+
+/* ================= BACKGROUND ================= */
+.bg{
+position:fixed;
+width:100vw;
+height:100vh;
+object-fit:cover;
+z-index:-1;
+}
+
+/* ================= WINDOWS BTN ================= */
+.winbar{
+position:absolute;
+top:10px;
+left:10px;
+display:flex;
+gap:8px;
+z-index:100;
+}
+
+.winbtn{
+width:32px;
+height:32px;
+background:rgba(0,0,0,0.6);
+color:white;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+border-radius:6px;
+}
+
+/* ================= WIDGET ================= */
+.widget{
+position:absolute;
+border-radius:12px;
+overflow:hidden;
+}
+
+.widget iframe{
+width:100%;
+height:100%;
+border:none;
+pointer-events:none;
+}
+
+.handle{
+position:absolute;
+width:16px;
+height:16px;
+right:0;
+bottom:0;
+background:rgba(255,255,255,0.3);
+cursor:nwse-resize;
+}
+
+/* ================= MODE: VERTICAL ================= */
+body.vertical #clockBox{ top:10px; left:10px; width:180px; height:120px; }
+body.vertical #chat{ top:140px; left:10px; width:220px; height:300px; }
+body.vertical #topgif{ top:450px; left:10px; width:220px; height:200px; }
+body.vertical #toplike{ top:660px; left:10px; width:220px; height:200px; }
+body.vertical #yt{ top:880px; left:10px; width:260px; height:200px; }
+
+/* ================= MODE: HORIZONTAL ================= */
+body.horizontal #clockBox{ top:10px; left:80px; width:200px; height:120px; }
+body.horizontal #chat{ top:150px; left:10px; width:250px; height:300px; }
+body.horizontal #topgif{ top:150px; left:270px; width:250px; height:200px; }
+body.horizontal #toplike{ top:360px; left:270px; width:250px; height:200px; }
+body.horizontal #yt{ top:150px; left:530px; width:300px; height:250px; }
+/* ================= FRAME BASE ================= */
+.widget iframe{
+width:600px; /* ukuran asli */
+height:400px;
+transform-origin:top left;
+border:none;
+}
+
+/* ================= MODE: VERTICAL ================= */
+body.vertical #clockBox{ top:20px; left:80px; width:180px; height:120px; }
+body.vertical #clockBox iframe{ transform:scale(0.25); }
+
+body.vertical #chat{ top:140px; left:10px; width:220px; height:300px; }
+body.vertical #chat iframe{ transform:scale(0.45); }
+
+body.vertical #topgif{ top:450px; left:200px; width:220px; height:200px; }
+body.vertical #topgif iframe{ transform:scale(0.50); }
+
+body.vertical #toplike{ top:300px; left:200px; width:220px; height:200px; }
+body.vertical #toplike iframe{ transform:scale(0.50); }
+
+body.vertical #yt{ top:400px; left:5px; width:260px; height:200px; }
+body.vertical #yt iframe{ transform:scale(0.35); }
+
+
+/* ================= MODE: HORIZONTAL ================= */
+body.horizontal #clockBox{ top:-30px; left:160px; width:200px; height:120px; }
+body.horizontal #clockBox iframe{ transform:scale(0.32); }
+
+body.horizontal #chat{ top:150px; left:10px; width:250px; height:300px; }
+body.horizontal #chat iframe{ transform:scale(0.50); }
+
+body.horizontal #topgif{ top:120px; left:30px; width:250px; height:200px; }
+body.horizontal #topgif iframe{ transform:scale(0.55); }
+
+body.horizontal #toplike{ top:120px; left:200px; width:250px; height:200px; }
+body.horizontal #toplike iframe{ transform:scale(0.55); }
+
+body.horizontal #yt{ top:150px; left:480px; width:300px; height:250px; }
+body.horizontal #yt iframe{ transform:scale(0.45); }
+
+</style>
+</head>
+
+<body>
+
+<img id="bg" class="bg">
+
+<!-- WINDOWS BUTTON -->
+<div class="winbar">
+<div class="winbtn" onclick="minimize()">—</div>
+<div class="winbtn" onclick="toggleFull()">⬜</div>
+<div class="winbtn" onclick="restore()">⤢</div>
+</div>
+
+<!-- WIDGET -->
+<div id="clockBox" class="widget">
+<iframe src="https://baseoverlay-rvtikstream.pages.dev/clock/clock.html?session=RV_WBQXETSK&color=%233b82f6"></iframe>
+<div class="handle"></div>
+</div>
+
+<div id="chat" class="widget">
+<iframe src="https://widgets.indofinity.com/widgets/chat/terminal/4ac66a8a-1e3c-4446-8768-1d5d2d8dae2b"></iframe>
+<div class="handle"></div>
+</div>
+
+<div id="topgif" class="widget">
+<iframe src="https://widgets.indofinity.com/widgets/gift/leaderboard/4ac66a8a-1e3c-4446-8768-1d5d2d8dae2b"></iframe>
+<div class="handle"></div>
+</div>
+
+<div id="toplike" class="widget">
+<iframe src="https://widgets.indofinity.com/widgets/likes/4ac66a8a-1e3c-4446-8768-1d5d2d8dae2b"></iframe>
+<div class="handle"></div>
+</div>
+
+<div id="yt" class="widget">
+<iframe src="https://widgets.indofinity.com/widgets/youtube-glass/4ac66a8a-1e3c-4446-8768-1d5d2d8dae2b"></iframe>
+<div class="handle"></div>
+</div>
+
+<script>
+let active=null, offsetX=0, offsetY=0;
+
+/* ================= MODE AUTO ================= */
+function setMode(){
+if(window.innerWidth > window.innerHeight){
+document.body.classList.add("horizontal");
+document.body.classList.remove("vertical");
+document.getElementById("bg").src="image/horizontal.png";
+}else{
+document.body.classList.add("vertical");
+document.body.classList.remove("horizontal");
+document.getElementById("bg").src="image/vertical.png";
+}
+}
+window.addEventListener("resize", setMode);
+setMode();
+
+/* ================= WINDOWS ================= */
+function toggleFull(){
+if(!document.fullscreenElement){
+document.documentElement.requestFullscreen();
+}else{
+document.exitFullscreen();
+}
+}
+
+function minimize(){
+document.body.style.display="none";
+setTimeout(()=>document.body.style.display="block",2000);
+}
+
+function restore(){
+document.body.style.display="block";
+}
+
+/* ================= DRAG ================= */
+document.querySelectorAll(".widget").forEach(el=>{
+
+el.addEventListener("mousedown",e=>{
+if(e.target.classList.contains("handle")) return;
+
+active=el;
+offsetX = e.clientX - el.offsetLeft;
+offsetY = e.clientY - el.offsetTop;
+
+document.onmousemove=e=>{
+if(!active) return;
+active.style.left = (e.clientX - offsetX)+"px";
+active.style.top = (e.clientY - offsetY)+"px";
+};
+
+document.onmouseup=()=>{
+active=null;
+};
+});
+});
+
+/* ================= RESIZE ================= */
+document.querySelectorAll(".handle").forEach(h=>{
+let el=h.parentElement;
+
+h.addEventListener("mousedown",e=>{
+e.stopPropagation();
+
+document.onmousemove=e=>{
+el.style.width=(e.clientX-el.offsetLeft)+"px";
+el.style.height=(e.clientY-el.offsetTop)+"px";
+};
+
+document.onmouseup=()=>{
+document.onmousemove=null;
+};
+});
+});
+</script>
+
+</body>
+</html>
